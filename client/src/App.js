@@ -8,6 +8,8 @@ import UserProfilePage from './pages/UserProfilePage';
 import Navigation from './components/Navigation';
 import SocketEventHandler from './context/SocketEventHandler';
 
+
+//components
 function App() {
   return (
     <Router>
