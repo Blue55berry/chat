@@ -15,10 +15,13 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // to accept JSON data
 
+const translationRoutes = require("./routes/translationRoutes");
+
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/translate", translationRoutes);
 
 // Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -64,7 +67,10 @@ io.on("connection", (socket) => {
 
     if (!chat.users) return console.log("chat.users not defined");
 
+    console.log('chat.users:', chat.users);
     chat.users.forEach((user) => {
+      console.log('user._id:', user._id);
+      console.log('newMessageReceived.sender._id:', newMessageReceived.sender._id);
       if (user._id === newMessageReceived.sender._id) return;
 
       socket.in(user._id).emit("message received", newMessageReceived);

@@ -24,6 +24,12 @@ const allMessages = async (req, res) => {
 const sendMessage = async (req, res) => {
   try {
     const { content, chatId } = req.body;
+    let filteredContent = content;
+    if (content) {
+      const Filter = require('bad-words');
+      const filter = new Filter();
+      filteredContent = filter.clean(content);
+    }
     const files = req.files || [];
 
     if ((!content || content.trim() === '') && files.length === 0) {
@@ -45,7 +51,7 @@ const sendMessage = async (req, res) => {
 
     let newMessage = {
       sender: req.user._id,
-      content: content || "",
+      content: filteredContent || "",
       chat: chatId,
       attachments: attachments
     };

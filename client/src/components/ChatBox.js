@@ -288,6 +288,20 @@ const ChatBox = () => {
     }
   };
 
+  const translateMessage = async (message, index) => {
+    try {
+      const { data } = await api.post("/api/translate", {
+        text: message.content,
+        targetLanguage: "en", // You can make this dynamic
+      });
+      const updatedMessages = [...messages];
+      updatedMessages[index].content = data.translatedText;
+      setMessages(updatedMessages);
+    } catch (error) {
+      console.error("Error translating message:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-green-800 rounded-lg shadow-md">
       {selectedChat ? (
@@ -403,6 +417,7 @@ const ChatBox = () => {
                             </p>
                           )}
                           {msg.content && <p>{msg.content}</p>}
+                          <button onClick={() => translateMessage(msg, index)}>Translate</button>
                           
                           {msg.attachments && msg.attachments.length > 0 && (
                             <div className="mt-2 space-y-2 ">

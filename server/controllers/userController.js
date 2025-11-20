@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const Chat = require('../models/Chat');
 
 // @desc    Register a new user
 // @route   POST /api/users
@@ -145,4 +146,27 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, authUser, allUsers, updateUserProfile, getUserProfile };
+const getChatContacts = async (req, res) => {
+  try {
+    const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+      .populate("users", "-password")
+      .populate("latestMessage");
+
+    const contacts = chats.reduce((acc, chat) => {
+      chat.users.forEach(user => {
+        if (user._id.toString() !== req.user._id.toString()) {
+          if (!acc.some(contact => contact._id.toString() === user._id.toString())) {
+            acc.push(user);
+          }
+        }
+      });
+      return acc;
+    }, []);
+
+    res.json(contacts);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, authUser, allUsers, updateUserProfile, getUserProfile, getChatContacts };
